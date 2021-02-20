@@ -180,7 +180,7 @@ class BE_Media_From_Production {
 
 		$regex = '/\"\/app\/uploads[^\" ]+/i';
 		preg_match_all($regex, $content, $matches);
-		var_dump($matches);
+		//var_dump($matches);
 
 		foreach( $matches[0] as $url ) {
 			// if( false !== strpos( $url, $upload_locations[ 'baseurl' ] ) ) {
