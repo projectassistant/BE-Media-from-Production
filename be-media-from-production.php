@@ -47,6 +47,31 @@ class BE_Media_From_Production {
 	public $production_url = '';
 
 	/**
+	 * Holds list of upload directories
+	 * Can set manually here, or allow function below to automatically create it
+	 *
+	 * @since 1.0.0
+	 * @var array
+	 */
+	public $directories = array();
+
+	/**
+	 * Start Month
+	 *
+	 * @since 1.0.0
+	 * @var int
+	 */
+	public $start_month = false;
+
+	/**
+	 * Start Year
+	 *
+	 * @since 1.0.0
+	 * @var int
+	 */
+	public $start_year = false;
+
+	/**
 	 * Primary constructor.
 	 *
 	 * @since 1.0.0
@@ -58,6 +83,7 @@ class BE_Media_From_Production {
 		add_filter( 'wp_get_attachment_image_attributes', array( $this, 'image_attr'             ), 99 );
 		add_filter( 'wp_prepare_attachment_for_js',       array( $this, 'image_js'               ), 10, 3 );
 		add_filter( 'the_content',                        array( $this, 'image_content'          )     );
+		add_filter( 'the_content',                        array( $this, 'image_content_relative'          )     );
 		add_filter( 'wp_get_attachment_url',              array( $this, 'update_image_url'       )     );
 
 	}
@@ -129,14 +155,40 @@ class BE_Media_From_Production {
 	function image_content( $content ) {
 		$upload_locations = wp_upload_dir();
 
-		$regex = '/https?\:\/\/[^\") ]+/i';
+		$regex = '/https?\:\/\/[^\" ]+/i';
 		preg_match_all($regex, $content, $matches);
 
 		foreach( $matches[0] as $url ) {
 			if( false !== strpos( $url, $upload_locations[ 'baseurl' ] ) ) {
 				$new_url = $this->update_image_url( $url );
+				// echo $url."<staing>";
 				$content = str_replace( $url, $new_url, $content );
 			}
+		}
+		return $content;
+	}
+
+	/**
+	 * Modify Images in Content
+	 *
+	 * @since 1.2.0
+	 * @param string $content
+	 * @return string $content
+	 */
+	function image_content_relative( $content ) {
+		$upload_locations = wp_upload_dir();
+
+		$regex = '/\"\/app\/uploads[^\" ]+/i';
+		preg_match_all($regex, $content, $matches);
+		var_dump($matches);
+
+		foreach( $matches[0] as $url ) {
+			// if( false !== strpos( $url, $upload_locations[ 'baseurl' ] ) ) {
+				$url = str_replace("\"", "", $url);
+				$new_url = $this->update_image_url_relative( $url );
+				// echo $new_url;
+				$content = str_replace( $url, $new_url, $content );
+			// }
 		}
 		return $content;
 	}
@@ -188,6 +240,32 @@ class BE_Media_From_Production {
 		$image_url = str_replace( trailingslashit( home_url() ), trailingslashit( $production_url ), $image_url );
 		return $image_url;
 	}
+
+	/**
+	 * Update Image URL
+	 *
+	 * @since 1.0.0
+	 * @param string $image_url
+	 * @return string $image_url
+	 */
+	function update_image_url_relative( $image_url ) {
+
+		if( ! $image_url )
+			return $image_url;
+
+		if ( $this->local_image_exists( $image_url ) ) {
+			// echo 'have imagel';
+			return $image_url;
+		}
+
+		$production_url = esc_url( $this->get_production_url() );
+		if( empty( $production_url ) )
+			return $image_url;
+
+		$image_url = $production_url.$image_url;
+		return $image_url;
+	}
+
 
 	/**
 	 * Return the production URL
