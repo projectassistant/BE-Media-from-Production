@@ -1,7 +1,7 @@
 {
-  "name": "projectassistant/BE-Media-from-Production",
-  "type": "wordpress-plugin",
-  "require": {
-    "composer/installers": "~1.0.12"
-  }
+ "name": "projectassistant/BE-Media-from-Production",
+ "type": "wordpress-plugin",
+ "require": {
+   "composer/installers": "^1.8"
+ }
 }
