@@ -1,5 +1,5 @@
 {
- "name": "projectassistant/BE-Media-from-Production",
+ "name": "projectassistant/media-from-production",
  "type": "wordpress-plugin",
  "require": {
    "composer/installers": "^1.8"
