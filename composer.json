@@ -2,6 +2,6 @@
  "name": "projectassistant/media-from-production",
  "type": "wordpress-plugin",
  "require": {
-   "composer/installers": "^1.8"
+   "composer/installers": "^1.10"
  }
 }
